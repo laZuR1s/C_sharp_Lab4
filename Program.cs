@@ -28,68 +28,74 @@ namespace С_sharp_Lab4
             }
             Console.WriteLine();
         }
-        static int[][] task(int size, ref int[,] arr)
+        static int[] task(int i, int size, ref int[] arr, out int maxStartIndex, out int maxcount)
         {
-            int[][] row = new int[size][];
 
-            for (int i = 0; i < size; i++)
+
+
+            int currentStartIndex = -1;
+            maxStartIndex = -1;
+            int count = 0;
+            maxcount = 0;
+            bool flag = true;
+            for (int j = 0; j < size; j++)
             {
-                int currentStartIndex = -1;
-                int maxStartIndex = -1;
-                int count = 0;
-                int maxcount = 0;
-                bool flag = true;
-
-                for (int j = 0; j < size; j++)
+                if (arr[j] > 0)
                 {
-                    if (arr[i, j] > 0)
+                    count++;
+                    if (flag)
                     {
-                        count++;
-                        if (flag)
-                        {
-                            currentStartIndex = j;
-                            flag = false;
-                        }
-                    }
-                    else
-                    {
-
-                        if (count > maxcount)
-                        {
-                            maxcount = count;
-                            maxStartIndex = currentStartIndex;
-                        }
-
-                        count = 0;
-                        currentStartIndex = -1;
-                        flag = true;
-                    }
-                }
-
-                if (count > maxcount)
-                {
-                    maxcount = count;
-                    maxStartIndex = currentStartIndex;
-                }
-
-
-                if (maxcount > 0)
-                {
-                    row[i] = new int[maxcount];
-                    for (int k = 0; k < maxcount; k++)
-                    {
-                        row[i][k] = arr[i, maxStartIndex + k];
+                        currentStartIndex = j;
+                        flag = false;
                     }
                 }
                 else
                 {
-                    row[i] = new int[0];
+
+                    if (count > maxcount)
+                    {
+                        maxcount = count;
+                        maxStartIndex = currentStartIndex;
+                    }
+
+                    count = 0;
+                    currentStartIndex = -1;
+                    flag = true;
                 }
+            }
 
+            if (count > maxcount)
+            {
+                maxcount = count;
+                maxStartIndex = currentStartIndex;
+            }
 
-                flag = true;
-                maxcount = 0;
-                maxStartIndex = -1;
+            int[] outRow = new int[size];
+
+            if (maxcount > 0)
+            {
+                outRow = new int[maxcount];
+                for (int k = 0; k < maxcount; k++)
+                {
+                    outRow[k] = arr[maxStartIndex + k];
+                }
+            }
+            else
+            {
+                outRow = new int[0];
+            }
+
+            return outRow;
+        }
+
+        static int[] GetRow(int[,] matrix, int rowIndex)
+        {
+            int columns = matrix.GetLength(1);
+            int[] row = new int[columns];
+
+            for (int j = 0; j < columns; j++)
+            {
+                row[j] = matrix[rowIndex, j];
             }
 
             return row;
@@ -102,25 +108,47 @@ namespace С_sharp_Lab4
 
             int n;
             int.TryParse(Console.ReadLine(), out n);
+            int[] row;
+            int[] row1;
+            int[][] matrix2 = new int[n][]; ;
+            int[,] matrix = new int[n, n];
 
-            int[][] row = new int[n][];
-            int[,] arr = new int[n, n];
-            fill_matrix(n, arr);
+            fill_matrix(n, matrix);
             Console.WriteLine("\nПроизвольно заданная матрица: ");
-            print_matrix(n, arr);
+            print_matrix(n, matrix);
 
-            row = task(n, ref arr);
+            for (int i = 0; i < n; ++i)
+            {
+                int maxStartIndex;
+                int maxcount;
+                row = GetRow(matrix, i);
+
+                row1 = task(i, n, ref row, out maxStartIndex, out maxcount);
+                if (maxcount > 0)
+                {
+                    matrix2[i] = new int[maxcount];
+                    for (int k = 0; k < maxcount; k++)
+                    {
+                        matrix2[i][k] = row1[k];
+                    }
+                }
+                else
+                {
+                    matrix2[i] = new int[0];
+                }
+
+            }
 
             Console.WriteLine("\nМатрица с положительными последовательностями: ");
-            for (int i = 0; i < row.Length; i++)
+            for (int i = 0; i < matrix2.Length; i++)
             {
-                if (row[i].Length > 0) 
+                if (matrix2[i].Length > 0)
                 {
-                    for (int j = 0; j < row[i].Length; j++)
+                    for (int j = 0; j < matrix2[i].Length; j++)
                     {
-                        Console.Write(row[i][j] + " ");
+                        Console.Write(matrix2[i][j] + " ");
                     }
-                    Console.WriteLine(); 
+                    Console.WriteLine();
                 }
                 else
                 {
